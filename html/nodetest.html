@@ -4,6 +4,9 @@
     </head>
     <body>
         <h3>Test for socket.io</h3>
+        <div id="event" style="width:100%;color:black;font-size:12pt;">
+            <br>
+        </div>
     </body>
     <script>
         const socket=io("http://hg.hatarisu.ru:8080/");
@@ -11,6 +14,7 @@
 
         socket.on("push",(obj)=>{
             console.log(obj);
+            document.getElementById("event").innerHTML= document.getElementById("event").innerHTML+"<br/>"+ JSON.stringify(obj);
         });
         // socket.connect('http://hg.hatarisu.ru:8080/'); 
 

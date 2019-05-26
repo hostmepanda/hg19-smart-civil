@@ -12,12 +12,22 @@ const port = 8080;
 const publicFolder=path.join(__dirname,"/publicFolder");
 app.use(express.static(publicFolder));
 
+const emitEvents={
+    "1": { "TS": "1559907920", "text": "7 июня отключение горячей воды" },
+    "2": { "TS": "1559919600", "text": "Публичные слушания: Внесение изменений в правила землепользования" },
+    "3": { "TS": "1580019600", "text": "План основных мероприятий Совета депутатов муниципального образования на февраль 2020 года" },
+    "4": { "TS": "1568098800", "text": "Программа празднования 223-летия города Гатчина" },
+};
+
+let emitIndex=1;
+
 io.on("connection",()=>{
     console.log("client is connected");
     setInterval(()=>{
         console.log(Math.round((new Date())/1000)+" Event is emitted");
-        
-        io.emit("push", { "TS":"1559907920","text":"7 июня отключение горячей воды"});
+        // io.emit("push", { "TS": "1559907920", "text": "7 июня отключение горячей воды" });
+        io.emit("push", emitEvents[emitIndex]);
+        emitIndex = Math.round(Math.random() * 10 + 1) % 4 + 1; 
     },30000);
 });
 

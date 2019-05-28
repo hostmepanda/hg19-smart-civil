@@ -203,7 +203,7 @@ class serverApi{
             !isset($this->request->payload->organisators->uid) || empty($this->request->payload->organisators->uid)
           ){
 
-            return ["status"=>"400","text"=>"Bad request. Not enough params","method"=>"createEvent"];
+            return ["status"=>"400","text"=>"Bad request. Not enough params","method"=>"createEvent","debugLevel"=>"0","request"=>$this->request];
 
         }
         // HERE DATA VALIDATION ENDS
@@ -213,9 +213,9 @@ class serverApi{
 
         // key with all events is events and it is a list
         $this->request->payload->eid=$eid;
-        $this->request->payload->start=date("U",strtotime($this->request->payload->start));
-        $this->request->payload->end=date("U",strtotime($this->request->payload->end));
-        $this->request->payload->deadline=date("U",strtotime($this->request->payload->deadline));
+        $this->request->payload->start=$this->request->payload->start;//date("U",strtotime($this->request->payload->start));
+        $this->request->payload->end=$this->request->payload->end;//date("U",strtotime($this->request->payload->end));
+        $this->request->payload->deadline=$this->request->payload->deadline;//date("U",strtotime($this->request->payload->deadline));
         $this->request->payload->likes="0";
         $this->request->payload->dislikes="0";
         $this->request->payload->isFinished="false";
@@ -249,6 +249,7 @@ class serverApi{
         // echo serialize(json_encode($this->request->payload));
         $this->db->lpush( "events", json_encode($this->request->payload) );
         $response=$this->request->payload;
+        // $response->debug=$this->request;
         return $response;
     }
 
@@ -261,17 +262,18 @@ class serverApi{
         $eventRange=$this->db->lrange("events",0,-1);
         foreach ($eventRange as $arrayIndex => $eventRaw) {
             $eventJSON=json_decode($eventRaw,false);
+            $eventJSONArr=json_decode($eventRaw,true);
             if($eventJSON->eid==$this->request->payload->eid){
-                if(!isset($eventJSON->usersId[$this->request->payload->uid])){
+                if(!isset($eventJSONArr["usersId"]["{$this->request->payload->uid}"])){
 
-                        $eventJSON->users[]=[
+                        $eventJSONArr["users"][]=[
                             "uid"=>$this->getUser()->uid,
                             "name"=>$this->getUser()->name,
                             "isHere"=>"false",
                         ];
 
-                    $eventJSON->usersId[$this->request->payload->uid]="true";
-                    $this->db->lset("events",$arrayIndex,json_encode($eventJSON));
+                    $eventJSONArr["users"]["{$this->request->payload->uid}"]="true";
+                    $this->db->lset("events",$arrayIndex,json_encode(json_encode($eventJSONArr),false));
                     return $this->getEvent();
                 }
 

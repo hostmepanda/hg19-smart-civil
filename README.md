@@ -9,3 +9,5 @@
 2. Redis - хранение данных
 3. Nodejs - пуши
 
+## Клиентская часть (мобильное приложение)
+https://github.com/ivanszhuravlev/hg-2019-front/tree/master
